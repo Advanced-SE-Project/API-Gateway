@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/server.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "ts-node ./app.ts",
     "start:dev": "nodemon",
     "test:unit": "cross-env NODE_ENV=test jest"
   },
