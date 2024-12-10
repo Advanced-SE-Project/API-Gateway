@@ -7,6 +7,7 @@ import axios from 'axios';
 import authRouter from './src/routes/auth';
 import transactionRouter from './src/routes/transaction';
 import { NextFunction } from 'http-proxy-middleware/dist/types';
+import swaggerJSDoc from 'swagger-jsdoc';
 
 dotenv.config();
 
@@ -15,8 +16,73 @@ const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:5000'
 
 const app = express();
 
+// Function to fetch Swagger definitions from backend services
+const fetchSwaggerDocs = async () => {
+    const swaggerDocs = [];
+
+    try {
+        //const authServiceSwagger = await axios.get(`${process.env.AUTH_SERVICE_URL}/swagger.json`);
+        //@ts-ignore
+        //swaggerDocs.push(authServiceSwagger.data);
+
+        //Add transaction service to swagger
+        const transactionServiceSwagger = await axios.get(`http://localhost:5001/swagger.json`);
+        const newPaths: any = {};
+        Object.keys(transactionServiceSwagger.data.paths).forEach((path) => {
+            // Add '/transaction-service' prefix to each path
+            newPaths[`/transaction-service${path}`] = transactionServiceSwagger.data.paths[path];
+        });
+        //@ts-ignore
+        swaggerDocs.push({ ...transactionServiceSwagger.data, paths: newPaths });
+
+        return swaggerDocs;
+    } catch (err) {
+        console.error('Error fetching Swagger docs:', err);
+        return [];
+    }
+};
+
+
 // Set up Swagger UI at the `/swagger` endpoint
-app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use('/swagger', swaggerUi.serve, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const backendSwaggerDocs = await fetchSwaggerDocs();
+
+        // Merge the Swagger docs
+        const swaggerDefinition = {
+            openapi: '3.0.0',
+            info: {
+                title: 'API Gateway',
+                version: '1.0.0',
+                description: 'API Gateway for proxying requests to backend services.',
+            },
+            servers: [
+                {
+                    url: 'http://localhost:5001',
+                },
+            ],
+            paths: {},
+        };
+
+        // Merge each backend service Swagger file into the API Gateway
+        backendSwaggerDocs.forEach((serviceSwagger) => {
+            //@ts-ignore
+            Object.assign(swaggerDefinition.paths, serviceSwagger.paths);
+        });
+
+        const swaggerSpec = swaggerJSDoc({
+            swaggerDefinition,
+            apis: ['./src/routes/*.ts', './src/routes/*.js'],
+        });
+
+        // Serve the merged Swagger UI
+        //@ts-ignore
+        return swaggerUi.setup(swaggerSpec)(req, res);
+    } catch (err) {
+        console.error('Error merging Swagger docs:', err);
+        res.status(500).send('Error merging Swagger docs');
+    }
+});
 
 // Middleware for validating JWT
 // JWT validation middleware
