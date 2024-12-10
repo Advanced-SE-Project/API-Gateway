@@ -22,8 +22,9 @@ app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 // JWT validation middleware
 app.use(async (req: Request, res: Response, next: NextFunction) => {
     // Skip JWT validation for unprotected routes like register and login
-    if (req.url.startsWith('/api/auth/register') || req.url.startsWith('/api/auth/login')) {
+    if (req.url.startsWith('/auth-service')) {
         next();
+        return;
     }
 
     // Extract the token from Authorization header (Bearer token)
@@ -31,9 +32,11 @@ app.use(async (req: Request, res: Response, next: NextFunction) => {
 
     if (!token) {
         res.status(401).json({ message: 'Authorization token is missing' });
+        return;
     }
 
     try {
+        console.log("⚠⚠⚠")
         // Make a request to the authentication service to validate the token
         const response = await axios.post(`${AUTH_SERVICE_URL}/api/auth/validate`, {}, {
             headers: { 'authorization': `Bearer ${token}` }
@@ -42,14 +45,18 @@ app.use(async (req: Request, res: Response, next: NextFunction) => {
         if (response.status === 200 && response.data.valid) {
             console.log('JWT validated successfully');
             // Attach user data to the request object for further use in route handlers
+            req.body = {};
             req.body.user = response.data.user;
             next();
+            return;
         } else {
             res.status(401).json({ message: 'Invalid token' });
+            return;
         }
     } catch (err) {
         console.error('Error during JWT validation:', err);
         res.status(500).json({ message: 'Failed to validate token' });
+        return;
     }
 });
 
