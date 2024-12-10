@@ -1,5 +1,5 @@
-const swaggerJsDoc = require('swagger-jsdoc');
-const dotenv = require('dotenv');
+import swaggerJsDoc from 'swagger-jsdoc';
+import dotenv from 'dotenv';
 dotenv.config();
 
 const port = process.env.PORT;
@@ -22,4 +22,5 @@ const swaggerOptions = {
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
-module.exports = swaggerDocs;
+
+export default swaggerDocs;
