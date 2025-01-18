@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const transactionServiceRouter = require('./src/routes/transaction');
 const authServiceRouter = require('./src/routes/auth');
+const analyticsRouter = require('./src/routes/analytics');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocs = require('./src/swagger/swaggerConfig');
 const axios = require('axios');
@@ -55,6 +56,9 @@ app.use('/auth-service', authServiceRouter);
 
 // Transaction routes
 app.use('/transaction-service', transactionServiceRouter);
+
+// Analytics routes
+app.use('/analytics-service', analyticsRouter);
 
 // Start the server and listen on the configured port
 app.listen(PORT, () => {
