@@ -68,7 +68,7 @@ router.use(
     createProxyMiddleware({
         target: AUTH_SERVICE_URL,
         changeOrigin: true,
-        pathRewrite: { '^/auth': '' }, // Strip "/auth" from the path
+        pathRewrite: { '^/auth-service': '' }, 
         onProxyReq: (proxyReq, req) => {
             if (req.method === 'POST' && req.body) {
                 const bodyData = JSON.stringify(req.body);
