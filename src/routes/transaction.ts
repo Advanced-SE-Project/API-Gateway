@@ -1,18 +1,19 @@
-const express = require('express');
-const router = express.Router();
-const { createProxyMiddleware } = require('http-proxy-middleware');
-const dotenv = require('dotenv');
+import express, { Router } from 'express';
+import { createProxyMiddleware } from 'http-proxy-middleware';
+import dotenv from 'dotenv';
 
 dotenv.config();
+
+const router: Router = express.Router();
 
 // Middleware to log incoming requests to the gateway
 router.use((req, res, next) => {
     console.log('Incoming Request to Gateway:', {
-        method: req.method, 
-        url: req.url, 
+        method: req.method,
+        url: req.url,
         body: req.body,
     });
-    next(); 
+    next();
 });
 
 // Middleware to log outgoing responses from the gateway
@@ -103,21 +104,9 @@ router.use(
     '/',
     createProxyMiddleware({
         target: process.env.TRANSACTION_SERVICE_URL,
-        changeOrigin: true, 
+        changeOrigin: true,
         pathRewrite: { '^/transaction-service': '' }, // Remove the "/transaction-service" prefix before forwarding
-
-        // Handle proxy request modifications
-        onProxyReq: (proxyReq, req) => {
-            if (req.method === 'POST' && req.body) {
-                const bodyData = JSON.stringify(req.body); 
-                proxyReq.setHeader('Content-Type', 'application/json'); 
-                proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
-                proxyReq.write(bodyData);
-            }
-        },
     })
 );
 
-module.exports = router;
-
-module.exports = router;
+export default router;
