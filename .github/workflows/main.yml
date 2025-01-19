@@ -16,6 +16,9 @@ jobs:
     env:  
       NODE_ENV: test
       PORT: 3001
+      AUTH_SERVICE_URL: 'http://localhost:3002'
+      TRANSACTION_SERVICE_URL: 'http://localhost:5001'
+      ANALYTICS_SERVICE_URL: 'http://localhost:5002'
 
     steps:
     - name: Checkout code
