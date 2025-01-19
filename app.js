@@ -3,10 +3,14 @@ const dotenv = require('dotenv');
 const transactionServiceRouter = require('./src/routes/transaction');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocs = require('./src/swagger/swaggerConfig');
+const userAuthRouter = require('./src/routes/userAuth');
+// const authenticateToken = require('./src/middleware/authMiddleware');
 dotenv.config();
 
 const port = process.env.PORT;
 const app = express();
+
+app.use(express.json());
 
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
@@ -26,6 +30,8 @@ app.use((req, res, next) => {
 
 // Proxy routes
 app.use('/transaction-service', transactionServiceRouter);
+
+app.use('/auth-service', userAuthRouter);
 
 app.listen(port, () => {
     console.log(`API Gateway Listening at http://localhost:${port}`);
