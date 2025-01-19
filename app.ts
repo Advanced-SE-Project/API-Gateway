@@ -142,3 +142,5 @@ app.listen(PORT, () => {
     console.log(`API Gateway Listening at http://localhost:${PORT}`);
     console.log("Swagger Docs available at http://localhost:4000/swagger");
 });
+
+export default app;
