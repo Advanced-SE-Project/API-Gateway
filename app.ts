@@ -6,6 +6,7 @@ import swaggerDocs from './src/swagger/swaggerConfig';
 import axios from 'axios';
 import authRouter from './src/routes/auth';
 import transactionRouter from './src/routes/transaction';
+import analyticsRouter from './src/routes/analytics';
 import { NextFunction } from 'http-proxy-middleware/dist/types';
 import swaggerJSDoc from 'swagger-jsdoc';
 import { fetchSwaggerDocs } from './src/swagger/swaggerUtils';
@@ -75,6 +76,9 @@ app.use('/auth-service', authRouter);
 
 // Transaction routes
 app.use('/transaction-service', transactionRouter);
+
+app.use('/analytics-service', analyticsRouter);
+
 
 // Start the server and listen on the configured port
 app.listen(PORT, () => {

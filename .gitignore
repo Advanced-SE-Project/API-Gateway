@@ -40,3 +40,7 @@ out/
 # Database Files 
 *.sqlite
 *.db
+
+
+# Testing Files
+coverage/
