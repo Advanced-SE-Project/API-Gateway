@@ -3,7 +3,6 @@ import { NextFunction, Request, Response } from "express";
 import dotenv from 'dotenv';
 
 dotenv.config();
-const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:5000';
 
 
 export const verifyJwtMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -14,12 +13,14 @@ export const verifyJwtMiddleware = async (req: Request, res: Response, next: Nex
     ];
 
     // Allow requests to bypass authentication if from allowed origins
-    if (allowedOrigins.includes(req.hostname)) {
+    const requestOrigin = req.headers.origin;
+    if (requestOrigin && allowedOrigins.includes(requestOrigin)) {
         return next();
     }
 
     // Skip JWT validation for unprotected routes like register and login
-    if (req.url.startsWith('/auth-service')) {
+    console.log("req.url", req.url, req.url.includes('auth-service'))
+    if (req.url.includes('/auth-service')) {
         next();
         return;
     }
@@ -34,8 +35,9 @@ export const verifyJwtMiddleware = async (req: Request, res: Response, next: Nex
 
     try {
         // Make a request to the authentication service to validate the token
-        const response = await axios.post(`${AUTH_SERVICE_URL}/api/auth/validate`, {}, {
-            headers: { 'authorization': `Bearer ${token}` }
+        const response = await axios.post(`${process.env.AUTH_SERVICE_URL}/api/auth/validate`, {}, {
+            headers: { 'authorization': `Bearer ${token}` },
+            validateStatus: () => true
         });
 
         if (response.status === 200 && response.data.valid) {
