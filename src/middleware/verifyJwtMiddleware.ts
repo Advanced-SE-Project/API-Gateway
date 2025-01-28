@@ -7,6 +7,17 @@ const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:5000'
 
 
 export const verifyJwtMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    const allowedOrigins = [
+        process.env.TRANSACTION_SERVICE_URL,
+        process.env.AUTH_SERVICE_URL,
+        process.env.ANALYTICS_SERVICE_URL,
+    ];
+
+    // Allow requests to bypass authentication if from allowed origins
+    if (allowedOrigins.includes(req.hostname)) {
+        return next();
+    }
+
     // Skip JWT validation for unprotected routes like register and login
     if (req.url.startsWith('/auth-service')) {
         next();
