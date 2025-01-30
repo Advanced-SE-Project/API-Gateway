@@ -42,7 +42,9 @@ Ensure you have the following installed on your machine:
 3. Create a `.env` file in the project root and configure the following environment variables:
    ```env
    PORT=3000
-   TRANSACTION_SERVICE_URL=http://localhost:4000
+   TRANSACTION_SERVICE_URL=http://{transaction_service_url}:{transaction_service_port}
+   AUTH_SERVICE_URL=http://{auth_service_url}:{auth_service_port}
+   ANALYTICS_SERVICE_URL=http://{analytics_service_url}:{analytics_service_port}
    ```
 
 ## Usage
